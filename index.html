@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>VB TOOL KEY</title>
+</head>
+<body>
+
+<h2>VB TOOL KEY 24H</h2>
+
+Nhập HWID:<br><br>
+
+<input id="hwid">
+<button onclick="taokey()">Lấy Key</button>
+
+<h3 id="key"></h3>
+
+<script>
+
+function taokey(){
+
+let hwid=document.getElementById("hwid").value;
+
+let ngay=new Date();
+
+let text=
+hwid+
+ngay.getFullYear()+
+(ngay.getMonth()+1)+
+ngay.getDate();
+
+let key=btoa(text);
+
+document.getElementById("key").innerHTML=key;
+
+}
+
+</script>
+
+</body>
+</html>
