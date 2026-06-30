@@ -14,7 +14,7 @@ def get_db():
 def create_code():
     return "VB-" + "".join(random.choices(string.ascii_uppercase + string.digits, k=16))
 
-@app.route("/issue-code", methods=["POST"])
+@app.route("/issue-code", methods=["GET", "POST"])
 def issue_code():
     code = create_code()
     expire = int(time.time()) + 86400  # 24 giờ
