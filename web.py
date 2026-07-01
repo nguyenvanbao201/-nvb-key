@@ -4,6 +4,13 @@ from datetime import datetime
 
 app = Flask(__name__)
 
+@app.route("/")
+def home():
+    return """
+    <h1>VB Tool Key</h1>
+    <p>Web hoạt động thành công.</p>
+    """
+
 @app.route("/key/<token>")
 def show_key(token):
     conn = sqlite3.connect("key.db")
