@@ -15,7 +15,7 @@ def create_key():
 def home():
     return "VBTOOL KEY SERVER"
 
-@app.route("/create_free_key", methods=["POST"])
+@app.route("/create_free_key", methods=["GET", "POST"])
 def create_free_key():
     data = request.json
     device_id = data["device_id"]
