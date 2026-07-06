@@ -56,7 +56,11 @@ def verify_key():
     info["device"] = device
     info["time"] = datetime.now().isoformat()
 
+    print("Device:", device)
+
     save_keys(keys)
+
+    print(load_keys()[key])
 
 
     if info["duration"] == "never":
@@ -75,4 +79,3 @@ def verify_key():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
-    
