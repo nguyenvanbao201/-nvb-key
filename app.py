@@ -1,50 +1,78 @@
 from flask import Flask, request, jsonify
+from datetime import datetime
 import json
-import random
-import string
-from datetime import datetime, timedelta
+import os
 
 app = Flask(__name__)
 
-# Hàm tạo key ngẫu nhiên
-def create_key():
-    chars = string.ascii_uppercase + string.digits
-    return "TBTOOL-" + "".join(random.choice(chars) for _ in range(8))
+KEY_FILE = "keys.json"
 
-@app.route("/")
-def home():
-    return "VBTOOL KEY SERVER"
 
-@app.route("/create_free_key", methods=["POST"])
-def create_free_key():
+def load_keys():
+    if not os.path.exists(KEY_FILE):
+        return {}
+
+    with open(KEY_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def save_keys(data):
+    with open(KEY_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=4)
+
+
+@app.route("/api/verify_key", methods=["POST"])
+def verify_key():
     data = request.json
-    device_id = data["device_id"]
 
-    # Đọc file keys.json
-    try:
-        with open("keys.json", "r") as f:
-            keys = json.load(f)
-    except:
-        keys = {}
+    device = data.get("device_id", "")
+    key = data.get("key", "").upper().strip()
 
-    # Tạo key mới
-    key = create_key()
+    keys = load_keys()
 
-    # Lưu key
-    keys[key] = {
-        "device_id": device_id,
-        "used": False,
-        "type": "FREE",
-        "expire": (datetime.now() + timedelta(days=1)).isoformat()
-    }
+    if key not in keys:
+        return jsonify({
+            "success": False,
+            "message": "Key không tồn tại"
+        })
 
-    with open("keys.json", "w") as f:
-        json.dump(keys, f, indent=4)
+    info = keys[key]
 
+    expire = datetime.fromisoformat(info["expire"])
+
+    if datetime.now() > expire:
+        return jsonify({
+            "success": False,
+            "message": "Key hết hạn"
+        })
+
+    if info["used"]:
+        return jsonify({
+            "success": False,
+            "message": "Key đã sử dụng"
+        })
+
+    info["used"] = True
+    info["device"] = device
+    info["time"] = datetime.now().isoformat()
+
+    save_keys(keys)
+
+
+    if info["duration"] == "never":
+        duration = 24 * 365 * 10   # 10 năm
+        is_forever = True
+    else:
+        duration = int(info["duration"]) * 24
+        is_forever = False
     return jsonify({
-        "success": True,
-        "key": key
-    })
+            "success": True,
+            "key_type": info["type"],
+            "duration": duration,
+            "is_forever": False
+        })
+
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0", port=5000)
+    
