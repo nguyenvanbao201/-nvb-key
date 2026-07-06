@@ -7,7 +7,6 @@ app = Flask(__name__)
 
 KEY_FILE = "keys.json"
 
-
 def load_keys():
     if not os.path.exists(KEY_FILE):
         return {}
@@ -15,11 +14,9 @@ def load_keys():
     with open(KEY_FILE, "r", encoding="utf-8") as f:
         return json.load(f)
 
-
 def save_keys(data):
     with open(KEY_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4)
-
 
 @app.route("/api/verify_key", methods=["POST"])
 def verify_key():
@@ -62,7 +59,6 @@ def verify_key():
 
     print(load_keys()[key])
 
-
     if info["duration"] == "never":
         duration = 24 * 365 * 10   # 10 năm
         is_forever = True
@@ -70,12 +66,11 @@ def verify_key():
         duration = int(info["duration"]) * 24
         is_forever = False
     return jsonify({
-            "success": True,
-            "key_type": info["type"],
-            "duration": duration,
-            "is_forever": False
-        })
-
+        "success": True,
+        "key_type": info["type"],
+        "duration": duration,
+        "is_forever": is_forever
+    })
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
